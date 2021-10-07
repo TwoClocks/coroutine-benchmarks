@@ -17,7 +17,7 @@ class SpinEventLoop( val readBuf: Bytes<Void>) {
     }
 
     fun spinLoop() {
-        var value = readBuf.readLong(0)
+        var value = lastValue
         while(true) {
             while(value == lastValue) {
                 java.lang.Thread.onSpinWait();
