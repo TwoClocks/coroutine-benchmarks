@@ -39,7 +39,7 @@ impl MappedAtomics {
     pub fn client_run_once(&self, value: u64) {
         self.client_write.store(value, Ordering::Relaxed);
 
-        let mut last_read = self.server_write.load(Ordering::Relaxed);
+        let mut last_read = !value;
 
         while value != last_read {
             last_read = self.server_write.load(Ordering::Relaxed);

@@ -119,7 +119,6 @@ fn kotlin_async_bench(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    kotlin_async_bench,
     rust_bench,
     rust_async_bench,
     zig_bench,
