@@ -1,6 +1,6 @@
 # async-benchmarks
 
-At attempt at benchmarking the overhead of async/coroutine IO vs procedural IO in Rust, Zig & Koltin.
+##Benchmarking the overhead of async/coroutine IO vs procedural IO in Rust, Zig & Koltin.
 
 #### TLDR; at end
 ## Background
@@ -28,7 +28,7 @@ fn runLoop( clientPtr : *const u64, serverPtr : *u64 ) void {
 
 fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
 
-    var newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
+    var newValue = lastValue;
 
     while( newValue == lastValue ) {
         std.atomic.spinLoopHint();
@@ -38,26 +38,19 @@ fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
 }
 ```
 
-I split the code into two function, because the compilers seemed to like it better that way. I got better numbers with two function. I am not a x86 assembly master, but the resulting ASM from the above looks pretty good to my eyes :
+I split the code into two function, because the compilers seemed to like it better that way. I got better numbers with two function, than with two nested `while` loops. I am not a x86 assembly master, but the resulting ASM from the above looks pretty good to me.
 ```asm
 runLoop:
         xor     eax, eax
-        mov     rcx, qword ptr [rdi]
-        cmp     rcx, rax
-        jne     .LBB0_3
 .LBB0_1:
         pause
         mov     rcx, qword ptr [rdi]
         cmp     rcx, rax
         je      .LBB0_1
-.LBB0_3:
         mov     qword ptr [rsi], rcx
         mov     rax, rcx
-        mov     rcx, qword ptr [rdi]
-        cmp     rcx, rax
-        je      .LBB0_1
-        jmp     .LBB0_3
-```
+        jmp     .LBB0_1
+ ```
 
 There is only one client, and it's in Rust. Mostly because the criterion benchmarking crate is really great at this kind of microbenchmark stuff. (unless it's not, and that's why my results are so strange).
 
@@ -103,8 +96,42 @@ I used the machines I have at home for this. One is an `Intel i7-8700K`, the oth
 Each test did a 3 second warm up, then ran for 30 seconds. 1K of samples are taken from each run. You can reach about criterion's sampling methodology if you are curious about that. It also has great graphing out of the box, but I love R's ggplot. JVM was Graal 11.0.12
 
 ## TLDR; Results
-[!Intel](graphs/intel.png)
-[!Amd](graphs/amd.png)
+![](graphs/intel.png)
+![](graphs/amd.png)
+
+Not what I expected. I have run these and tweaked samll things here and there, like adding or removing the spin cpu hint (AMD loves it) or refactoring. Stuff moves around a little, but they stay relativity in this order. The AMD ones are more likely to occasionally switch order, but I think that's only because it's faster with smaller differences between the languages.
+The ASM for the async code has a lot of jumping around. And `call` & `ret` instead of `jmp`s in the critical path. I find it really hard to follow.
+I know I committed the sin of not starting graphs at zero (and having different scales in different graphs), but I really do want to accentuate the deltas.
+
+## Takeaways
+Async is faster than procedural (except on the JVM on Intel)?
+
+The JVM JIT spits out really good Intel machine code (but not so good on AMD)?
+
+async kotlin code has a lot of jitter.
+
+The last one doesn't supprise me. The others do.
+I can't help but think something is wrong with my tests.
+
+## Where is C++?
+I don't write C++ for my personal project out of spite. Feel free to put up a PR if you want to see that is well. Or OCaml or whatever. I'll happily run it on the same hardware in the same enviroment and update the results.
+
+## How to build run
+The Rust stuff in the root directly is pretty easy. Just install Rust on your system and run `cargo build`
+
+You'll need a JDK and gradle for the kotlin code. In the kotlin directly run `gradle build`
+
+The zig stuff is easy. Have zig in your path (there is a snap for it). in the zig directory run `zig build`
+
+to run the tests, in the root directory run `cargo bench`
+
+in `src\lib.rs` you can change which CPUs things run on.
+
+The benchmark code generates html output repots. They are in the `target` directory someplace. The R code that generates these graphs is in `graphs`. If you know R, you know what to do. If you don't, I wouldn't bother.
+ 
+
+
+
 
 
 

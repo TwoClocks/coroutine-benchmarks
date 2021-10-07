@@ -29,27 +29,32 @@ fn asyncLoop( clientPtr : *const u64, serverPtr : *u64, ev:*EventLoop) void {
 
 const EventLoop = struct {
     last_value : u64 = 0,
+    next_value : u64 = 0,
     readPtr : *const u64 = undefined,
-    spinWait : utils.SuspendHelper(u64) = .{.value=0},
+    suspend_point : anyframe = undefined,
 
     pub fn getNextValue(self:*EventLoop, readPtr:*const u64,last : u64 ) u64 {
         self.readPtr = readPtr;
         self.last_value = last;
-        return self.spinWait.suspendMe();
+        suspend {
+            self.suspend_point = @frame();
+        }
+        return self.next_value;
     }
 
 
     pub fn run( self:*EventLoop ) void {
         while(true) {
-            const next = spinUntilChange(self.readPtr,self.last_value);
-            self.spinWait.resumeMe( next );
+            self.next_value = spinUntilChange(self.readPtr,self.last_value);
+
+            resume self.suspend_point;
         }
     }
 };
 
 fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
 
-    var newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
+    var newValue = lastValue;
 
     while( newValue == lastValue ) {
         std.atomic.spinLoopHint();

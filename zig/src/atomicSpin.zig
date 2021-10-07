@@ -24,7 +24,7 @@ fn runLoop( clientPtr : *const u64, serverPtr : *u64 ) void {
 
 fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
 
-    var newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
+    var newValue = lastValue;
 
     while( newValue == lastValue ) {
         std.atomic.spinLoopHint();

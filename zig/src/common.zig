@@ -14,36 +14,36 @@ const std = @import("std");
 
 
 
-pub fn SuspendHelper(comptime T:type ) type {
-    return struct {
-        const Self = @This();
-        value: T,
-        suspend_context : ?anyframe = null,
+// pub fn SuspendHelper(comptime T:type ) type {
+//     return struct {
+//         const Self = @This();
+//         value: T,
+//         suspend_context : ?anyframe = null,
 
-        pub fn suspendMe(self:*Self) T {
-            if(self.suspend_context) |_| {
-                std.debug.panic("suspend context already exists. re-enternat code. die\n",.{});
-            } else {
-                suspend {
-                    self.suspend_context = @frame(); // this is how you suspend in zig.
-                }
-            }
-            return self.value;
-        }
+//         pub fn suspendMe(self:*Self) T {
+//             if(self.suspend_context) |_| {
+//                 std.debug.panic("suspend context already exists. re-enternat code. die\n",.{});
+//             } else {
+//                 suspend {
+//                     self.suspend_context = @frame(); // this is how you suspend in zig.
+//                 }
+//             }
+//             return self.value;
+//         }
 
-        pub fn resumeMe(self:*Self, value:T) void {
-            if(self.suspend_context) |w| {
-                self.value = value;
-                const tmp = w;
-                self.suspend_context = null;
-                resume tmp;
-            } else {
-                std.debug.print("suspend : resume called w/ no frame.",.{});
-            }
-        }
+//         pub fn resumeMe(self:*Self, value:T) void {
+//             if(self.suspend_context) |w| {
+//                 self.value = value;
+//                 const tmp = w;
+//                 self.suspend_context = null;
+//                 resume tmp;
+//             } else {
+//                 std.debug.print("suspend : resume called w/ no frame.",.{});
+//             }
+//         }
     
-    };
-}
+//     };
+// }
 
 
 

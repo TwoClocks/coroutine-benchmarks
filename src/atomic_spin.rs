@@ -20,7 +20,7 @@ impl MappedAtomics {
     /// in a separate function than in-line by hand.
     #[inline(always)]
     pub fn server_spin_until_change(&self, last_value: u64) -> u64 {
-        let mut new_value = self.client_write.load(Ordering::Relaxed);
+        let mut new_value = last_value;
         while new_value == last_value {
             core::hint::spin_loop();
             new_value = self.client_write.load(Ordering::Relaxed);
