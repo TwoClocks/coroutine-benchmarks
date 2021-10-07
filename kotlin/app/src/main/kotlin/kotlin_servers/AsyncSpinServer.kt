@@ -26,8 +26,6 @@ class SpinEventLoop( val readBuf: Bytes<Void>) {
             suspendPoint.resume( value )
         }
     }
-
-
 }
 
 
@@ -42,7 +40,6 @@ fun main(args: Array<String>) {
     val loop = SpinEventLoop(cliBuf)
 
     AffinityLock.acquireLock(cpu_num).use {
-//        it.bind(false)
 
 
         val mainLoop = suspend {

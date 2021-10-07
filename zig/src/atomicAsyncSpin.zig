@@ -18,6 +18,7 @@ pub fn main() anyerror!void {
 }
 
 
+// this is the async loop
 fn asyncLoop( clientPtr : *const u64, serverPtr : *u64, ev:*EventLoop) void {
     var value : u64 = 0;
     while(true) {
