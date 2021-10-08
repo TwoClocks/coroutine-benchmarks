@@ -36,14 +36,15 @@ impl MappedAtomics {
         }
     }
 
+    #[inline(always)]
     pub fn client_run_once(&self, value: u64) {
         self.client_write.store(value, Ordering::Relaxed);
 
         let mut last_read = !value;
 
         while value != last_read {
-            last_read = self.server_write.load(Ordering::Relaxed);
             core::hint::spin_loop();
+            last_read = self.server_write.load(Ordering::Relaxed);
         }
     }
 
@@ -122,7 +123,7 @@ impl MappedAtomics {
         mem_ptr
     }
 
-    pub fn close(&mut self) {
+    pub fn close(&self) {
         unsafe {
             libc::munmap(self.mmap_ptr, page_size::get());
             libc::shm_unlink(crate::SH_MEM_NAME.as_ptr());

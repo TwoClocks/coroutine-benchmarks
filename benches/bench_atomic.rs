@@ -6,7 +6,7 @@ use async_bench::{CLIENT_CPU, SERVER_CPU};
 
 fn rust_bench(c: &mut Criterion) {
     // map memory
-    let mut client = MappedAtomics::new(true);
+    let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
@@ -15,9 +15,7 @@ fn rust_bench(c: &mut Criterion) {
         vec![SERVER_CPU].as_ref(),
     );
 
-    let b_fn = |p: u64| client.client_run_once(p);
-
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "rust_atomic", b_fn);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "rust_atomic", &client );
 
     client.close();
     child.kill().expect("error killing server process");
@@ -34,9 +32,7 @@ fn rust_async_bench(c: &mut Criterion) {
         vec![SERVER_CPU].as_ref(),
     );
 
-    let b_fn = |p: u64| client.client_run_once(p);
-
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "rust_async", b_fn);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "rust_async", &client);
 
     client.close();
     child.kill().expect("error killing server process");
@@ -51,9 +47,7 @@ fn zig_bench(c: &mut Criterion) {
     let mut child =
         async_bench::bench_utils::launch_local("zig/zig-out/bin/atomicSpin", vec![SERVER_CPU].as_ref());
 
-    let b_fn = |p: u64| client.client_run_once(p);
-
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "zig_atomic", b_fn);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "zig_atomic", &client);
 
     client.close();
     child.kill().expect("error killing server process");
@@ -70,9 +64,7 @@ fn zig_async_bench(c: &mut Criterion) {
         vec![SERVER_CPU].as_ref(),
     );
 
-    let b_fn = |p: u64| client.client_run_once(p);
-
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "zig_async", b_fn);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "zig_async", &client);
 
     client.close();
     child.kill().expect("error killing server process");
@@ -90,9 +82,8 @@ fn kotlin_bench(c: &mut Criterion) {
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
     );
-    let b_fn = |p: u64| client.client_run_once(p);
 
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "kotlin_atomic", b_fn);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "kotlin_atomic", &client);
 
     client.close();
     child.kill().expect("error killing server process");
@@ -109,9 +100,8 @@ fn kotlin_async_bench(c: &mut Criterion) {
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
     );
-    let b_fn = |p: u64| client.client_run_once(p);
 
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "kotlin_async", b_fn);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "kotlin_async", &client);
 
     client.close();
     child.kill().expect("error killing server process");

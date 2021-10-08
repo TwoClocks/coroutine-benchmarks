@@ -1,7 +1,8 @@
-use crate::SAMPLE_SIZE;
+use crate::{SAMPLE_SIZE, RUN_TIME, WARMUP_TIME};
 use criterion::{BatchSize, Criterion};
 use rand::RngCore;
 use std::time::Duration;
+use crate::atomic_spin::MappedAtomics;
 
 lazy_static! {
     pub static ref JAVA_OPTS: Vec<&'static str> = vec![
@@ -49,17 +50,16 @@ pub fn launch_local_java(
 }
 
 /// some boilerplate code pulled out into a function.
-pub fn run_bench<F>(c: &mut Criterion, group_name: &str, bench_name: &str, mut bench_fn: F)
-where
-    F: FnMut(u64),
+pub fn run_bench(c: &mut Criterion, group_name: &str, bench_name: &str, client:&MappedAtomics )
 {
     let mut group = c.benchmark_group(group_name);
-    group.measurement_time(Duration::from_secs(30));
+    group.warm_up_time( WARMUP_TIME );
+    group.measurement_time(RUN_TIME);
     group.sample_size(SAMPLE_SIZE);
     group.bench_function(bench_name, |b| {
         b.iter_batched(
             || rand::thread_rng().next_u64(),
-            |payload| bench_fn(payload),
+            |payload| client.client_run_once(payload),
             BatchSize::SmallInput,
         )
     });
