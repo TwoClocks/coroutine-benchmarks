@@ -22,7 +22,7 @@ pub fn main() anyerror!void {
 fn asyncLoop( clientPtr : *const u64, serverPtr : *u64, ev:*EventLoop) void {
     var value : u64 = 0;
     while(true) {
-        value = await async ev.getNextValue(clientPtr,value);
+        value = ev.getNextValue(clientPtr,value);
         @atomicStore(u64, serverPtr, value, std.builtin.AtomicOrder.Monotonic );
     }
 }

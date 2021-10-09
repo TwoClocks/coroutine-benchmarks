@@ -10,6 +10,7 @@ use std::time::Duration;
 
 pub mod atomic_spin;
 pub mod bench_utils;
+pub mod async_impl;
 
 pub static SAMPLE_SIZE: usize = 1000;
 pub static WARMUP_TIME: Duration = Duration::from_secs(10);

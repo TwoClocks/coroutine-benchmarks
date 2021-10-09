@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="cpp"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/jonross/tinker/async-benchmarks/cpp"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/jonross/tinker/async-benchmarks/cpp"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/jonross/tinker/async-benchmarks/cpp"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="cpp">
+				<Option output="/home/jonross/tinker/async-benchmarks/cpp/cpp" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jonross/tinker/async-benchmarks/cpp"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 cpp"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="cpp/fast">
+				<Option output="/home/jonross/tinker/async-benchmarks/cpp/cpp" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/jonross/tinker/async-benchmarks/cpp"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 cpp/fast"/>
+					<CompileFile command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -f &quot;/home/jonross/tinker/async-benchmarks/cpp/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/jonross/tinker/async-benchmarks/cpp/MappedAtomics.cpp">
+			<Option target="cpp"/>
+		</Unit>
+		<Unit filename="/home/jonross/tinker/async-benchmarks/cpp/MappedAtomics.h">
+			<Option target="cpp"/>
+		</Unit>
+		<Unit filename="/home/jonross/tinker/async-benchmarks/cpp/main.cpp">
+			<Option target="cpp"/>
+		</Unit>
+		<Unit filename="/home/jonross/tinker/async-benchmarks/cpp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

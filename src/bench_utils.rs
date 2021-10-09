@@ -1,7 +1,6 @@
 use crate::{SAMPLE_SIZE, RUN_TIME, WARMUP_TIME};
 use criterion::{BatchSize, Criterion};
 use rand::RngCore;
-use std::time::Duration;
 use crate::atomic_spin::MappedAtomics;
 
 lazy_static! {

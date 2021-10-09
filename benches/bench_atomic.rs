@@ -21,26 +21,59 @@ fn rust_bench(c: &mut Criterion) {
     child.kill().expect("error killing server process");
 }
 
-fn rust_async_bench(c: &mut Criterion) {
+fn rust_async_resume(c: &mut Criterion) {
     // map memory
-    let mut client = MappedAtomics::new(true);
+    let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local(
-        "target/release/atomic_async_server",
+        "target/release/atomic_async_resume",
         vec![SERVER_CPU].as_ref(),
     );
 
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "rust_async", &client);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "rust_async_resume", &client);
 
     client.close();
     child.kill().expect("error killing server process");
 }
 
+fn rust_async_suspend(c: &mut Criterion) {
+    // map memory
+    let client = MappedAtomics::new(true);
+
+    core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
+
+    let mut child = async_bench::bench_utils::launch_local(
+        "target/release/atomic_async_suspend",
+        vec![SERVER_CPU].as_ref(),
+    );
+
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "rust_async_suspend", &client);
+
+    client.close();
+    child.kill().expect("error killing server process");
+}
+
+
+fn cpp_bench(c: &mut Criterion) {
+    // map memory
+    let client = MappedAtomics::new(true);
+
+    core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
+
+    let mut child =
+        async_bench::bench_utils::launch_local("cpp/target/release/cpp", vec![SERVER_CPU].as_ref());
+
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "cpp_atomic", &client);
+
+    child.kill().expect("error killing server process");
+    client.close();
+}
+
 fn zig_bench(c: &mut Criterion) {
     // map memory
-    let mut client = MappedAtomics::new(true);
+    let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
@@ -53,26 +86,44 @@ fn zig_bench(c: &mut Criterion) {
     child.kill().expect("error killing server process");
 }
 
-fn zig_async_bench(c: &mut Criterion) {
+fn zig_async_resume(c: &mut Criterion) {
     // map memory
-    let mut client = MappedAtomics::new(true);
+    let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local(
-        "zig/zig-out/bin/atomicAsyncSpin",
+        "zig/zig-out/bin/atomicAsyncResume",
         vec![SERVER_CPU].as_ref(),
     );
 
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "zig_async", &client);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "zig_resume", &client);
 
     client.close();
     child.kill().expect("error killing server process");
 }
 
+fn zig_async_suspend(c: &mut Criterion) {
+    // map memory
+    let client = MappedAtomics::new(true);
+
+    core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
+
+    let mut child = async_bench::bench_utils::launch_local(
+        "zig/zig-out/bin/atomicAsyncSuspend",
+        vec![SERVER_CPU].as_ref(),
+    );
+
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "zig_suspend", &client);
+
+    client.close();
+    child.kill().expect("error killing server process");
+}
+
+
 fn kotlin_bench(c: &mut Criterion) {
     // map memory
-    let mut client = MappedAtomics::new(true);
+    let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
@@ -90,7 +141,7 @@ fn kotlin_bench(c: &mut Criterion) {
 }
 
 fn kotlin_async_bench(c: &mut Criterion) {
-    let mut client = MappedAtomics::new(true);
+    let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
@@ -109,10 +160,15 @@ fn kotlin_async_bench(c: &mut Criterion) {
 
 criterion_group!(
     benches,
+    cpp_bench,
+    zig_async_suspend,
+    zig_async_resume,
+    rust_async_resume,
+    rust_async_suspend,
     rust_bench,
-    rust_async_bench,
     zig_bench,
-    zig_async_bench,
+    zig_async_resume,
+    zig_async_suspend,
     kotlin_bench,
     kotlin_async_bench,
 );

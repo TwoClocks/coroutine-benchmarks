@@ -18,12 +18,19 @@ pub fn build(b: *std.build.Builder) void {
     exe.linkLibC();
     exe.install();
 
-    const exe2 = b.addExecutable("atomicAsyncSpin", "src/atomicAsyncSpin.zig");
+    const exe2 = b.addExecutable("atomicAsyncResume", "src/atomicAsyncResume.zig");
     exe2.single_threaded = true;
     exe2.setBuildMode(std.builtin.Mode.ReleaseFast);
     // exe.setBuildMode(std.builtin.Mode.Debug);
     exe2.linkLibC();
     exe2.install();
+
+    const exe3 = b.addExecutable("atomicAsyncSuspend", "src/atomicAsyncSuspend.zig");
+    exe3.single_threaded = true;
+    exe3.setBuildMode(std.builtin.Mode.ReleaseFast);
+    // exe.setBuildMode(std.builtin.Mode.Debug);
+    exe3.linkLibC();
+    exe3.install();
 
 
     const run_cmd = exe.run();
