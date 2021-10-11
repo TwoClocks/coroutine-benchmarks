@@ -12,18 +12,14 @@ import net.openhft.chronicle.core.OS
 import java.io.IOException
 
 
-fun mapMemory(doCreate:Boolean): Pair<Bytes<Void>, Bytes<Void>> {
+fun mapMemory(): Pair<Bytes<Void>, Bytes<Void>> {
+
     val lrt = com.sun.jna.platform.linux.LibRT.INSTANCE
 
-    val flgs = if(doCreate) {
-        Fcntl.O_CREAT or Fcntl.O_EXCL
-    } else {
-        Fcntl.O_RDWR
-    }
 
     val shm = lrt.shm_open(
         "/spinnmem",
-        flgs,
+        Fcntl.O_RDWR,
         Fcntl.S_IRUSR or Fcntl.S_IWUSR or Fcntl.S_IRGRP or Fcntl.S_IWGRP
     )
 

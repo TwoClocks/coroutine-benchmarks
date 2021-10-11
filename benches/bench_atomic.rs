@@ -21,7 +21,7 @@ fn rust_bench(c: &mut Criterion) {
     child.kill().expect("error killing server process");
 }
 
-fn rust_async_resume(c: &mut Criterion) {
+fn rust_resume(c: &mut Criterion) {
     // map memory
     let client = MappedAtomics::new(true);
 
@@ -38,7 +38,7 @@ fn rust_async_resume(c: &mut Criterion) {
     child.kill().expect("error killing server process");
 }
 
-fn rust_async_suspend(c: &mut Criterion) {
+fn rust_suspend(c: &mut Criterion) {
     // map memory
     let client = MappedAtomics::new(true);
 
@@ -70,6 +70,37 @@ fn cpp_bench(c: &mut Criterion) {
     child.kill().expect("error killing server process");
     client.close();
 }
+
+fn cpp_resume(c: &mut Criterion) {
+    // map memory
+    let client = MappedAtomics::new(true);
+
+    core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
+
+    let mut child =
+        async_bench::bench_utils::launch_local("cpp/target/release/asyncResume", vec![SERVER_CPU].as_ref());
+
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "cpp_resume", &client);
+
+    child.kill().expect("error killing server process");
+    client.close();
+}
+
+fn cpp_suspend(c: &mut Criterion) {
+    // map memory
+    let client = MappedAtomics::new(true);
+
+    core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
+
+    let mut child =
+        async_bench::bench_utils::launch_local("cpp/target/release/asyncSuspend", vec![SERVER_CPU].as_ref());
+
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "cpp_suspend", &client);
+
+    child.kill().expect("error killing server process");
+    client.close();
+}
+
 
 fn zig_bench(c: &mut Criterion) {
     // map memory
@@ -129,7 +160,7 @@ fn kotlin_bench(c: &mut Criterion) {
 
     let mut child = async_bench::bench_utils::launch_local_java(
         "kotlin/app/build/libs/app-all.jar",
-        "kotlin_servers.AtomicSpinServerKt",
+        "kotlin_servers.AtomicSpinKt",
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
     );
@@ -140,19 +171,37 @@ fn kotlin_bench(c: &mut Criterion) {
     child.kill().expect("error killing server process");
 }
 
-fn kotlin_async_bench(c: &mut Criterion) {
+fn kotlin_resume(c: &mut Criterion) {
     let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local_java(
         "kotlin/app/build/libs/app-all.jar",
-        "kotlin_servers.AsyncSpinServerKt",
+        "kotlin_servers.AsyncResumeKt",
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
     );
 
-    async_bench::bench_utils::run_bench(c, "atomic_spin", "kotlin_async", &client);
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "kotlin_resume", &client);
+
+    client.close();
+    child.kill().expect("error killing server process");
+}
+
+fn kotlin_suspend(c: &mut Criterion) {
+    let client = MappedAtomics::new(true);
+
+    core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
+
+    let mut child = async_bench::bench_utils::launch_local_java(
+        "kotlin/app/build/libs/app-all.jar",
+        "kotlin_servers.AsyncSuspendKt",
+        Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
+        vec![SERVER_CPU].as_ref(),
+    );
+
+    async_bench::bench_utils::run_bench(c, "atomic_spin", "kotlin_suspend", &client);
 
     client.close();
     child.kill().expect("error killing server process");
@@ -161,16 +210,17 @@ fn kotlin_async_bench(c: &mut Criterion) {
 criterion_group!(
     benches,
     cpp_bench,
-    zig_async_suspend,
-    zig_async_resume,
-    rust_async_resume,
-    rust_async_suspend,
+    cpp_resume,
+    cpp_suspend,
     rust_bench,
+    rust_resume,
+    rust_suspend,
     zig_bench,
     zig_async_resume,
     zig_async_suspend,
     kotlin_bench,
-    kotlin_async_bench,
+    kotlin_resume,
+    kotlin_suspend,
 );
 // criterion_group!(benches, kotlin_bench);
 criterion_main!(benches);

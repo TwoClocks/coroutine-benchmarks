@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
     val cpu_num = args.get(0).toInt()
 
 
-    val (cliBuf, srvBuf) = mapMemory(false)
+    val (cliBuf, srvBuf) = mapMemory()
 
     AffinityLock.acquireLock(cpu_num).use {
         doLoop(cliBuf,srvBuf)

@@ -7,11 +7,17 @@ add_compile_options(
         -Wextra
         -Wconversion
         -Wsign-conversion
+        -fcoroutines
+        -std=c++20
         $<$<CONFIG:DEBUG>:-g3>
         $<$<CONFIG:DEBUG>:-Og>
         $<$<CONFIG:RELEASE>:-Ofast>
         $<$<CONFIG:RELEASE>:-finline-functions>
 )
 
-add_executable(cpp main.cpp MappedAtomics.cpp MappedAtomics.h)
-TARGET_LINK_LIBRARIES(cpp rt)
+add_executable(atomicSpin atomicSpin.cpp MappedAtomics.cpp MappedAtomics.h)
+add_executable(asyncResume asyncResume.cpp MappedAtomics.cpp MappedAtomics.h)
+add_executable(asyncSuspend asyncSuspend.cpp MappedAtomics.cpp MappedAtomics.h)
+TARGET_LINK_LIBRARIES(atomicSpin rt)
+TARGET_LINK_LIBRARIES(asyncResume rt)
+TARGET_LINK_LIBRARIES(asyncSuspend rt)

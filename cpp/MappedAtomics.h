@@ -18,6 +18,15 @@ struct MappedAtomics {
     std::atomic<long unsigned int> *clientPtr;
     std::atomic<long unsigned int> *serverPtr;
 
+    inline long unsigned int spinUntilClientChange( long unsigned int lastValue ) {
+        auto nextValue = lastValue;
+        while( nextValue == lastValue ) {
+            __builtin_ia32_pause();
+            nextValue = this->clientPtr->load(std::memory_order_relaxed);
+        }
+        return nextValue;
+    }
+
     MappedAtomics() {
         int shmFd = shm_open(
                 "/spinnmem",
@@ -34,6 +43,7 @@ struct MappedAtomics {
             throw std::system_error(errno, std::generic_category());
         }
 
+
         void * mem_ptr = mmap(
                 NULL,
                 (size_t)getpagesize(),
@@ -47,21 +57,15 @@ struct MappedAtomics {
             throw std::system_error(errno, std::generic_category());
         }
 
-        clientPtr = (std::atomic<long unsigned int> *) mem_ptr;
+        clientPtr = static_cast<std::atomic<long unsigned int> *>(mem_ptr);
 
+        auto charPtr = static_cast<char *>(mem_ptr);
+        auto voidPtr = static_cast<void *>(charPtr+2048);
 
-        serverPtr = (std::atomic<long unsigned int> *)((char *)mem_ptr + 2048);
+        serverPtr = static_cast<std::atomic<long unsigned int> *>(voidPtr);
 
     }
 
-    inline long unsigned int spinUntilClientChange( long unsigned int lastValue ) {
-        auto nextValue = lastValue;
-        while( nextValue == lastValue ) {
-            __builtin_ia32_pause();
-            nextValue = this->clientPtr->load(std::memory_order_relaxed);
-        }
-        return nextValue;
-    }
 };
 
 
