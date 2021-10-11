@@ -39,7 +39,7 @@ asyncLoop( AsyncContext *context )
     while( true ) {
         co_await std::suspend_always{};
 
-        std::cout << "async put value " << context->putValue << std::endl;
+//        std::cout << "async put value " << context->putValue << std::endl;
         context->atomics->serverPtr->store( context->putValue, std::memory_order_relaxed );
 
     }
