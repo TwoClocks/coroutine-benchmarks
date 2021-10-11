@@ -72,13 +72,10 @@ int main(int argc, char * argv[]) {
 
     std::coroutine_handle<> handle = asyncLoop(&context);
 
-    int counter = 5;
-    while( counter > 0 ) {
-
+    while( true ) {
         context.putValue = context.atomics->spinUntilClientChange( context.putValue );
-        std::cout << "main value = " << context.putValue << std::endl;
+//        std::cout << "main value = " << context.putValue << std::endl;
         handle();
-        counter--;
     }
 
     return 0;

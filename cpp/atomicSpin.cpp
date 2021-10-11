@@ -26,7 +26,6 @@ int main(int argc, char * argv[]) {
     long unsigned int value = 0;
 
     while(true) {
-
         value = atomic->spinUntilClientChange( value );
         atomic->serverPtr->store( value, std::memory_order_relaxed );
     }

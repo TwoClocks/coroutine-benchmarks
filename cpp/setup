@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+mkdir target
+mkdir target/debug
+mkdir target/release
+cmake -S . -B target/release -DCMAKE_BUILD_TYPE=RELEASE
+cmake -S . -B target/debug -DCMAKE_BUILD_TYPE=DEBUG

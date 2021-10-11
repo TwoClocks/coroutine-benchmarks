@@ -38,7 +38,7 @@ asyncLoop( AsyncContext *context )
 
     while( true ) {
         context->putValue = context->atomics->spinUntilClientChange( context->putValue );
-        std::cout << "async value = " << context->putValue << std::endl;
+//        std::cout << "async value = " << context->putValue << std::endl;
         co_await std::suspend_always{};
     }
 }
@@ -70,12 +70,10 @@ int main(int argc, char * argv[]) {
 
     std::coroutine_handle<> handle = asyncLoop(&context);
 
-    int counter = 5;
-    while( counter > 0 ) {
-        std::cout << "main put value " << context.putValue << std::endl;
+    while( true ) {
+//        std::cout << "main put value " << context.putValue << std::endl;
         atomic->serverPtr->store( context.putValue, std::memory_order_relaxed );
         handle();
-        counter--;
     }
 
     return 0;

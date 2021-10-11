@@ -37,7 +37,7 @@ struct MappedAtomics {
             std::cout << "shm_open failed. exiting : " << std::strerror(errno) << std::endl;
             throw std::system_error(errno, std::generic_category());
         }
-        std::cout << "shm fd = " << shmFd << std::endl;
+//        std::cout << "shm fd = " << shmFd << std::endl;
         if( ftruncate( shmFd, getpagesize() ) != 0 )  {
             std::cout << "ftruncate failed. exiting : " << std::strerror(errno) << std::endl;
             throw std::system_error(errno, std::generic_category());
