@@ -22,7 +22,7 @@ pub fn main() anyerror!void {
 fn asyncLoop( clientPtr : *const u64, serverPtr : *u64, ev:*EventLoop) void {
     var value : u64 = 0;
     while(true) {
-        value = spinUntilChange( clientPtr, value );
+        value = utils.spinUntilChange( clientPtr, value );
         ev.putResult( serverPtr, value );
     }
 }
@@ -50,13 +50,3 @@ const EventLoop = struct {
     }
 };
 
-fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
-
-    var newValue = lastValue;
-
-    while( newValue == lastValue ) {
-        std.atomic.spinLoopHint();
-        newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
-    }
-    return newValue;
-}

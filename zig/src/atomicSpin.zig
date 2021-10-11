@@ -17,18 +17,8 @@ fn runLoop( clientPtr : *const u64, serverPtr : *u64 ) void {
     var lastValue : u64 = 0;
 
     while(true) {
-        lastValue = spinUntilChange( clientPtr, lastValue );
+        lastValue = utils.spinUntilChange( clientPtr, lastValue );
         @atomicStore(u64, serverPtr, lastValue, std.builtin.AtomicOrder.Monotonic );
     }
 }
 
-fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
-
-    var newValue = lastValue;
-
-    while( newValue == lastValue ) {
-        std.atomic.spinLoopHint();
-        newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
-    }
-    return newValue;
-}

@@ -45,20 +45,10 @@ const EventLoop = struct {
 
     pub fn run( self:*EventLoop ) void {
         while(true) {
-            self.next_value = spinUntilChange(self.readPtr,self.last_value);
+            self.next_value = utils.spinUntilChange(self.readPtr,self.last_value);
 
             resume self.suspend_point;
         }
     }
 };
 
-fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
-
-    var newValue = lastValue;
-
-    while( newValue == lastValue ) {
-        std.atomic.spinLoopHint();
-        newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
-    }
-    return newValue;
-}

@@ -14,6 +14,17 @@ const std = @import("std");
 
 
 
+pub fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64 {
+
+    var newValue = lastValue;
+
+    while( newValue == lastValue ) {
+        std.atomic.spinLoopHint();
+        newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
+    }
+    return newValue;
+}
+
 // pub fn SuspendHelper(comptime T:type ) type {
 //     return struct {
 //         const Self = @This();
