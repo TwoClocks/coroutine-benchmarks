@@ -2,9 +2,9 @@
 const std = @import("std");
 const utils = @import("common.zig");
 
-#
-# libuv / Calloop / Stakker
-#
+// #
+// # libuv / Calloop / Stakker
+// #
 
 const EventLoop = struct {
     const cbWrap = struct {

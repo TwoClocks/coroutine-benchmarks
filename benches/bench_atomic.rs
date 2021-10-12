@@ -276,8 +276,6 @@ fn kotlin_callback(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    rust_suspend,
-    rust_callback,
     cpp_bench,
     cpp_resume,
     cpp_suspend,
