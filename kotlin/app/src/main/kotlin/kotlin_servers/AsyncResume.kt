@@ -18,15 +18,10 @@ class ResumeEventLoop( val readBuf: Bytes<Void>, val writeBuf:Bytes<Void>) {
     }
 
     fun run() {
-        var nextValue = 0L;
-        var lastValue = 0L;
+        var value = 0L;
         while(true) {
-            while(nextValue == lastValue) {
-                java.lang.Thread.onSpinWait();
-                nextValue = readBuf.readLong(0)
-            }
-            suspendPoint.resume( nextValue )
-            lastValue = nextValue
+            value = spinUntilChange(readBuf,value)
+            suspendPoint.resume( value )
         }
     }
 }

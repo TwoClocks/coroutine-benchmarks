@@ -8,8 +8,8 @@ import net.openhft.chronicle.bytes.Bytes
 inline fun spinUntilChange(buf: Bytes<Void>, lastValue:Long ) : Long {
     var newValue = lastValue
     while( newValue == lastValue ) {
-        newValue = buf.readLong(0)
         java.lang.Thread.onSpinWait();
+        newValue = buf.readLong(0)
     }
     return newValue
 }

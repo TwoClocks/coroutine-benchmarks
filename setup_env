@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+# put everything in go-fast mode. don't let CPUs sleep.
+for i in /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+do
+  echo performance |sudo tee $i
+done
+
+# this is specific to my CPUs. 10 & 11 are hyper-threading in cores 4&5.
+# so lets turn those down. (also set isolcpus=4,5,10,11 on the kernel
+# cmd line.
+echo 0 | sudo tee /sys/devices/system/cpu/cpu10/online
+echo 0 | sudo tee /sys/devices/system/cpu/cpu11/online

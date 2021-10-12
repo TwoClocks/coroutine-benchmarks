@@ -19,15 +19,6 @@ class EventLoop(val readBuf:Bytes<Void>) {
 
     private var callback : ((Long)->Unit)? = null
 
-    inline fun spinUntilChange(buf: Bytes<Void>, lastValue: Long): Long {
-        var newValue = lastValue
-        while (newValue == lastValue) {
-            newValue = buf.readLong(0)
-            Thread.onSpinWait()
-        }
-        return newValue
-    }
-
     fun run() {
         var lastValue = 0L
         while (true) {

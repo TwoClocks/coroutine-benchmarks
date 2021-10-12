@@ -10,14 +10,9 @@ class SuspendEventLoop(val readBuf: Bytes<Void>, val writeBuf:Bytes<Void>) {
 
     suspend fun asyncLoop() {
         println("as starting")
-        var lastValue = value
         while(true) {
-            while( lastValue == value ) {
-                java.lang.Thread.onSpinWait();
-                value = readBuf.readLong(0)
-            }
+            value = spinUntilChange( readBuf, value )
             suspendPoint.suspendMe();
-            lastValue = value
         }
     }
 

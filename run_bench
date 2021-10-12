@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+
+mkdir -p ./runs
+
+copy_results() {
+	RUN_NUM=$1
+	for fl in $(find ./target/criterion -iwholename "*new/raw.csv"); do
+		#echo "$fl"
+		NEW_NAME=$(echo "$fl" | cut -d '/' -f 5);
+		#echo "$NEW_NAME"
+		CMD="cp $fl ./runs/"$NEW_NAME"_r"$RUN_NUM".csv"
+		#echo $CMD
+		eval $CMD
+	done
+}
+
+# this follows forks/child-processes.
+# so both the benchmarks and any process
+# the benchmarks launch (the ones under test)
+# get nice'd. "$$" is the PID of this process.
+sudo renice -n "-20" -p "$$"
+
+cargo bench
+copy_results 1
+
+cargo bench
+copy_results 2
+
+cargo bench
+copy_results 3
