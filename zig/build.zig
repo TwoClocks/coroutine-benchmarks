@@ -32,6 +32,13 @@ pub fn build(b: *std.build.Builder) void {
     exe3.linkLibC();
     exe3.install();
 
+    const exe4 = b.addExecutable("atomicCallback", "src/atomicCallback.zig");
+    exe4.single_threaded = true;
+    exe4.setBuildMode(std.builtin.Mode.ReleaseFast);
+    // exe.setBuildMode(std.builtin.Mode.Debug);
+    exe4.linkLibC();
+    exe4.install();
+
 
     const run_cmd = exe.run();
     run_cmd.step.dependOn(b.getInstallStep());

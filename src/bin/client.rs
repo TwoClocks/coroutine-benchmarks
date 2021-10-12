@@ -1,7 +1,7 @@
 use async_bench::atomic_spin::MappedAtomics;
 use core_affinity::CoreId;
 use std::io;
-use rand::{RngCore, Rng};
+use rand::RngCore;
 
 
 ///

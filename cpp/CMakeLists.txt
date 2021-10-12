@@ -18,6 +18,8 @@ add_compile_options(
 add_executable(atomicSpin atomicSpin.cpp MappedAtomics.cpp MappedAtomics.h)
 add_executable(asyncResume asyncResume.cpp MappedAtomics.cpp MappedAtomics.h)
 add_executable(asyncSuspend asyncSuspend.cpp MappedAtomics.cpp MappedAtomics.h)
+add_executable(atomicCallback atomicCallback.cpp MappedAtomics.cpp MappedAtomics.h)
 TARGET_LINK_LIBRARIES(atomicSpin rt)
 TARGET_LINK_LIBRARIES(asyncResume rt)
 TARGET_LINK_LIBRARIES(asyncSuspend rt)
+TARGET_LINK_LIBRARIES(atomicCallback rt)

@@ -22,7 +22,7 @@ struct MappedAtomics {
         auto nextValue = lastValue;
         while( nextValue == lastValue ) {
             __builtin_ia32_pause();
-            nextValue = this->clientPtr->load(std::memory_order_relaxed);
+            nextValue = clientPtr->load(std::memory_order_relaxed);
         }
         return nextValue;
     }
