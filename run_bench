@@ -28,3 +28,10 @@ copy_results 2
 
 cargo bench
 copy_results 3
+
+cargo bench
+copy_results 4
+
+cargo bench
+copy_results 5
+
