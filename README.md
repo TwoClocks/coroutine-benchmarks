@@ -1,6 +1,6 @@
 # async-benchmarks
 
-##Benchmarking the overhead of coroutine vs callbacks in Rust, Zig, C++ & Koltin.
+## Benchmarking the overhead of coroutine vs callbacks in Rust, Zig, C++ & Koltin.
 
 
 ## Background
@@ -9,13 +9,13 @@ I used to work at places that specialize in Ultra Low Latency (ULL) development,
 
 ## Motovation
 
-I recently did another project for a company in an adjacent industry, and I ended up using koltin coroutines for that project (not ULL, but still latency sensitive). It was great to write synchronous looking code that was concurrent. I really enjoyed that project. It made the code so much easier to write / reason about / read.
+I recently did another project for a company in an adjacent industry and used koltin coroutines (not ULL, but still latency sensitive). It was great to write synchronous looking code that was concurrent. Coroutines made the code so much easier to write / reason about / read.
 
-I might have another ULL project coming up, but they don't want to go the FPGA route (or as little as possible). So before that project happens I thought I would measure the overhead of coroutines vs callbacks. See how much the abstraction costs, so I can make informed decisions about its usage. I'm sharing this work in case anyone else cares.
+I have another ULL project coming up, so before that project happens I wanted to measure the overhead of coroutines vs callbacks. See how much the abstraction costs. See if the cost are a clear "no".
 
 ## Methodology
 
-I expected the coroutine overhead to be small, but to exist. I didn't want the root event/IO being waited on to dominate the results. So networking code was out. I decided to used shared memory instead and do a ping-pong test. The clint puts a `u64` in a memory location one, and times how long it takes that `u64` number to show up in memory location two. The server is spinning waiting for location one to change value, when it does it copies the new value to location two, then loops. Here is the server-side zig code and the resulting `asm` according to [compiler explorer](https://godbolt.org/) :
+I didn't want the root event/IO being waited on to dominate the results. Which ruled out networking IO. I decided to used shared memory instead and do a ping-pong test. The clint puts a `u64` in a memory location one, and times how long it takes that `u64` number to show up in memory location two. The server is spinning waiting for location one to change value, when it does it copies the new value to location two, then loops. Here is the server-side zig code and the resulting `asm` according to [compiler explorer](https://godbolt.org/) :
 
 
 
@@ -104,20 +104,19 @@ The code flow for the coroutine code looks like this `SpinLoop->Resume->WriteVal
 
 If the event loop is dispatching the same event to multiple listeners, or had multiple events to dispatch, you bear the cost of both the suspend and resume for each event.
 
-So I wrote two version of each coroutine. The version above is called the `Resume` version. The `Suspend` version code flow look like `SpinLoop->Suspend->WriteValue->Resume::Loop`. In the `Suspend` version the `SpinLoop` is in the coroutine code block, and the writing on the value is in the `eventLoop`.
+So I wrote two version of each coroutine. The version above is called the `Resume` version. The `Suspend` version code flow look like `SpinLoop->Suspend->WriteValue->Resume::Loop`. In the `Suspend` version the `SpinLoop` is in the coroutine code block, and the writing of the value is in the `eventLoop`.
 
 ### Callbacks
-The spin loop isn't a fair comparison to the coroutine code, so I added a callback version. This is the version you should compare to the coroutine code. I didn't write the reciprocal version of callback, like I did with the coroutine code. I'm just going to assume returning from a callback is cheap, and not time it. (maybe to my peril)
+The spin loop isn't a fair comparison to the coroutine code, so I added a callback version. I didn't write the reciprocal version of callback, like I did with the coroutine code. I'm just going to assume returning from a callback is cheap.
 
 ## Testing enviroment
 
-I used the machines I have at home for this. One is an `Intel i7-8700K`, the other is a newer `AMD Ryzen 5 5600G`. All the tests were run on bare metal. VMs might be fine for this kind of test though. Both CPUs have 6 core, 2 CPUs per core. The kernel has the `ioslcpu` param to isolate cores 5 & 6 (CPUs 4,5,10 & 11). The is client pinned to 4, and the server to 5. the AMD is headless, so easy to strip. The Intel is my dev box, so I'd boot to multi-user when running tests. Both are Ubuntu 20.04.
-Each test did a 3 second warm up, then ran for 5 seconds. 1K of samples are taken from each run. You can read about [criterion's sampling methodology](https://bheisler.github.io/criterion.rs/book/user_guide/advanced_configuration.html#sampling-mode) if you are curious about that. It also has great graphing out of the box, but I love R's ggplot. Even with isolated CPUs, there was a fair bit of jitter between runs on the Intel. Perhaps ubuntu isn't a good OS for this kind of thing. So I ran all the benchmarks multiple times, and took the best run for each benchmark. "Best" is the run w/ the smallest value for upper 95% confidence interval.
+I used the machines I have at home for this. One is an `Intel i7-8700K`, the other is a newer `AMD Ryzen 5 5600G`. Both CPUs have 6 core, 2 CPUs per core. The kernel has the `ioslcpu` param to isolate cores 5 & 6 (CPUs 4,5,10 & 11). The is client pinned to 4, and the server to 5. the AMD is headless, so easy to strip. The Intel is my dev box, so I'd boot to multi-user when running tests. Both are Ubuntu 20.04.
+Each test did a 3 second warm up, then ran for 5 seconds. 1K of samples are taken from each run. You can read about [criterion's sampling methodology here](https://bheisler.github.io/criterion.rs/book/user_guide/advanced_configuration.html#sampling-mode). Critersion graphing out of the box, but I love R's ggplot. Even with isolated CPUs, there was a fair bit of jitter between runs on the Intel. I ran all the benchmarks multiple times, and took the best run for each benchmark. "Best" is the run w/ the smallest value for upper 95% confidence interval.
 
 ## Graphs
-The plots are by languages because to compare the additional overhead for a given language, not the difference between languages. You can re-plot the data to compare languages if your interested in that.
-The plots commit the cardinal sin of not starting the y-axis at 0. This is to accentuate the differences. This makes it even harder to compare across languages.
-The graphs also clip long trials. the graphs cut off past the benchmark's 95% confidence interval. Tails are more likely because of a bad environment, than actual jitter in the tests.
+The plots are by languages to compare the additional overhead for a given language, not the difference between languages. The plots do not start x-axis at 0. This is to accentuate the differences. This makes it even harder to compare across languages.
+The graphs clip long tails. the graphs cut off a bit past the worst 95% confidence interval. For this test, tails are more likely because of a bad test environment than actual jitter in the tests.
 
 ## C++
 ![](graphs/cpp-Intel.png)
@@ -133,7 +132,7 @@ I could not get GCC to produce the same `asm` that zig & Rust output. Clang did,
 ![](graphs/rust-Intel.png)
 ![](graphs/rust-AMD.png)
 
-Rust's async/await implementations is the most complicated by far. The resume code is obtuse. You call a `waker` which then calls `poll` on the `future` that then resumes. Callbacks are awkward in Rust because of the borrow checker, so callbacks might not be the baseline to measure from. All this code was run on `release` version, with `native` target and `lto` enabled `rustc 1.55.0`. Writing this code felt like I'm not using async/await the way it was intended. It's just shoved into a coroutine looking box. I am an intermediate Rust dev at best. Criticism welcome.
+Rust's async/await implementations is the most complicated by far. The resume code is obtuse. You call a `waker` which then calls `poll` on the `future` that then resumes. Callbacks are awkward in Rust because of the borrow checker, so callbacks might not be the baseline to measure from. All this code was run on `release` version, with `native` target and `lto` enabled `rustc 1.55.0`. Writing this code felt like I'm not using async/await the way it was intended. I just shoved into a coroutine looking box. I am an intermediate Rust dev at best. Criticism welcome.
 ### takeaways
 * I can not explain why Suspend and Resume flip places on Intel vs AMD.
 * Despite concern about resume complexity, it's snappy on Intel.
@@ -144,12 +143,11 @@ Rust's async/await implementations is the most complicated by far. The resume co
 ![](graphs/zig-Intel.png)
 ![](graphs/zig-AMD.png)
 
-Zig isn't even 1.0 yet, and it's main developer says not to deploy it in production. Maybe it shouldn't be here at all. But I enjoyed writing this version the most. `comptime` is super fun. This was made with compiler version `0.8.1`
+Zig isn't even 1.0 yet, and it's creator says not to deploy it in production. Maybe it shouldn't be here at all. But I enjoyed writing this version the most. `comptime` is super fun. This was made with compiler version `0.8.1`
 
 ### takeaways
 * Callbacks are really fast, or the compiler is good at finding them and in-lining them. It might not scale to dispatching multiple events to multiple listeners.
-* Since you need to add both the Suspend and Resume time, coroutines with zig are a slower than C++.
-* Potential for C++ replacement for ULL stuff, if you can get over no traits or interfaces.
+* Potential for C++ replacement for ULL work, if you can get over no traits or interfaces.
 
 ## Kotlin
 ![](graphs/kotlin-Intel.png)
@@ -158,8 +156,8 @@ Zig isn't even 1.0 yet, and it's main developer says not to deploy it in product
 The kotlin project does not include the `kotlinx-coroutines-core` library. Just the Coroutine support provided by the compiler is used. The library implements `aysnc` and `launch`, so neither of those are in the code. Chronical's `OpenHFT/Affinity` and `OpenHFT/Bytes` packages are used. `Bytes` for little-endian reading/writing to a buffer setup from a pointer. You could replace with `Unsafe.getLong()`. I used JNA for calls to `shm_open` / `ftruncate` / `mmap`. Make sure it's installed if you want to run these. These were run with JVM `GraalVM CE 21.2.0 (build 11.0.12+6-jvmci-21.2-b08, mixed mode, sharing)`.
 
 ### Takeaways
-* The JIT can spit out some tight machine code. The spin version is right there with the others (except the tails)
-* The difference between callbacks and coroutines is smaller than I thought it would be. 
+* The JIT can generate some tight machine code. The spin version is right there with the others (except the tails)
+* The difference between callbacks and coroutines is smaller than I had assumed. Coroutines isn't a native JVM concept (yet), it entirely done by the kotlin compiler. 
 * If your already on the JVM, just use coroutines. You have other more important latency worries.
 
 ## Final Thoughts
@@ -174,7 +172,7 @@ You'll need a JDK and gradle for the kotlin code. In the kotlin directly run `gr
 
 Have zig in your path (there is a snap for it). in the zig directory run `zig build`
 
-In the `cpp` directory there are two scripts `setup` will create the target directories and make `cmake` aware of them. The `build` script builds both targets. GCC 11 required.
+In the `cpp` directory there are two scripts `setup` will create the target directories and set `cmake` for them. The `build` script builds both targets. GCC 11+ required.
 
 to run the tests, in the root directory run `cargo bench`
 
@@ -182,7 +180,7 @@ There are some other scripts specific to my environments. The `run_bench` sets a
 
 in `src\lib.rs` you can change which CPUs things run on.
 
-The benchmark code generates html output reports. They are in the `target` directory someplace. The R code that generates these graphs is in `graphs`.
+The benchmark suite generates html output reports. They are in the `target` directory someplace. The R code that generates these graphs is in `graphs`.
  
 
 
