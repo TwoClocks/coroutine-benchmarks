@@ -19,7 +19,7 @@ pub fn spinUntilChange( spinPtr:*const u64, lastValue:u64) callconv(.Inline) u64
     var newValue = lastValue;
 
     while( newValue == lastValue ) {
-        std.atomic.spinLoopHint();
+        //std.atomic.spinLoopHint();
         newValue = @atomicLoad(u64, spinPtr, std.builtin.AtomicOrder.Monotonic );
     }
     return newValue;

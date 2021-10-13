@@ -13,8 +13,8 @@ library(cowplot)
 
 font_import()
 
-#cpu_type <- "Intel i7-8700K"
-cpu_type <- "AMD Ryzen 5 5600G"
+cpu_type <- "Intel i7-8700K"
+#cpu_type <- "AMD Ryzen 5 5600G"
 
 find_maxy <- function( runs ) {
   rng <- runs %>% group_by( name ) %>% group_map( ~ median_hilow( . ) ) %>% 

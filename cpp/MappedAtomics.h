@@ -21,7 +21,7 @@ struct MappedAtomics {
     inline long unsigned int spinUntilClientChange( long unsigned int lastValue ) {
         auto nextValue = lastValue;
         while( nextValue == lastValue ) {
-            __builtin_ia32_pause();
+            //__builtin_ia32_pause();
             nextValue = clientPtr->load(std::memory_order_relaxed);
         }
         return nextValue;

@@ -22,7 +22,7 @@ impl MappedAtomics {
     pub fn server_spin_until_change(&self, last_value: u64) -> u64 {
         let mut new_value = last_value;
         while new_value == last_value {
-            core::hint::spin_loop();
+            //core::hint::spin_loop();
             new_value = self.client_write.load(Ordering::Relaxed);
         }
         new_value
@@ -43,7 +43,7 @@ impl MappedAtomics {
         let mut last_read = !value;
 
         while value != last_read {
-            core::hint::spin_loop();
+            //core::hint::spin_loop();
             last_read = self.server_write.load(Ordering::Relaxed);
         }
     }
