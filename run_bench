@@ -20,18 +20,12 @@ copy_results() {
 # get nice'd. "$$" is the PID of this process.
 sudo renice -n "-20" -p "$$"
 
-cargo bench
-copy_results 1
+i=1
 
-cargo bench
-copy_results 2
-
-cargo bench
-copy_results 3
-
-cargo bench
-copy_results 4
-
-cargo bench
-copy_results 5
+while [ $i -ne 100 ]
+do
+	cargo bench
+	copy_results $i
+	i=$((i+1))
+done
 
