@@ -136,6 +136,7 @@ Rust's async/await implementations is the most complicated by far. The resume co
 ### takeaways
 * I can not explain why Suspend and Resume flip places on Intel vs AMD.
 * Despite concern about resume complexity, it's snappy on Intel.
+* Callbacks seem slow. Might be my code.
 * I would use async/await for Rust because it's a better fit for the language.
 * There are other issues in Rust that might make it inappropriate for ULL code w/o a profusion of `unsafe`. This specific test does not point to any issues. Promising.
 
