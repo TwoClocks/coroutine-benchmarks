@@ -20,19 +20,21 @@ impl<'a> Worker<'a> {
 
 struct EventLoop<'a, T> {
     context : T,
-    callback: Option<&'a mut dyn FnMut(&mut T, u64)>,
+    callback: Option<&'a Fn(&mut T, u64)>,
     atomics: &'a MappedAtomics,
 }
 
 impl<'a, T> EventLoop<'a, T> {
-    fn set_callback(&mut self, cb: &'a mut dyn FnMut(&mut T, u64) ) {
+
+    fn set_callback(&mut self, cb:&'a Fn(&mut T, u64) ) {
         self.callback = Some(cb);
     }
+
     fn run(&mut self) {
         let mut last_value : u64 = 0;
         loop {
             last_value = self.atomics.server_spin_until_change(last_value);
-            if let Some(cb) = &mut self.callback {
+            if let Some(cb) = &self.callback {
                 cb( &mut self.context, last_value );
             }
         }
@@ -62,8 +64,11 @@ fn main() -> io::Result<()> {
     };
 
 
-    let func = &mut Worker::do_work;
-    ev.set_callback( func );
+    // let func = &Worker::do_work;
+    // let th : FnMut(&mut Worker, u64) = func;
+    ev.set_callback( &Worker::do_work );
+
+    // th(&wk,99);
 
     ev.run();
 
