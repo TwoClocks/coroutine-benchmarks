@@ -134,9 +134,8 @@ I could not get GCC to produce the same `asm` that zig & Rust output. Clang did,
 
 Rust's async/await implementations is the most complicated by far. The resume code is obtuse. You call a `waker` which then calls `poll` on the `future` that then resumes. Callbacks are awkward in Rust because of the borrow checker, so callbacks might not be the baseline to measure from. All this code was run on `release` version, with `native` target and `lto` enabled `rustc 1.55.0`. Writing this code felt like I'm not using async/await the way it was intended. I just shoved into a coroutine looking box. I am an intermediate Rust dev at best. Criticism welcome.
 ### takeaways
-* I can not explain why Suspend and Resume flip places on Intel vs AMD.
+* Why are callbacks & resume so different on Intel vs AMD?
 * Despite concern about resume complexity, it's snappy on Intel.
-* Callbacks seem slow. Might be my code.
 * I would use async/await for Rust because it's a better fit for the language.
 * There are other issues in Rust that might make it inappropriate for ULL code w/o a profusion of `unsafe`. This specific test does not point to any issues. Promising.
 

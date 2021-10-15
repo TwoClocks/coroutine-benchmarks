@@ -45,7 +45,7 @@ fn rust_suspend(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local(
-        "target/release/atomic_callback_server",
+        "target/release/atomic_async_suspend",
         vec![SERVER_CPU].as_ref(),
     );
 
@@ -62,7 +62,7 @@ fn rust_callback(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local(
-        "target/release/atomic_async_suspend",
+        "target/release/atomic_callback_server",
         vec![SERVER_CPU].as_ref(),
     );
 
@@ -276,6 +276,10 @@ fn kotlin_callback(c: &mut Criterion) {
 
 criterion_group!(
     benches,
+    rust_callback,
+    rust_callback,
+    rust_callback,
+    rust_callback,
     cpp_bench,
     cpp_resume,
     cpp_suspend,

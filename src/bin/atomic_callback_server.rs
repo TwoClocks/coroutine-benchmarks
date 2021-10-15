@@ -26,7 +26,7 @@ struct EventLoop<'a, T> {
 
 impl<'a, T> EventLoop<'a, T> {
 
-    fn set_callback(&mut self, cb:&'a Fn(&mut T, u64) ) {
+    fn set_callback(&mut self, cb:&'a impl Fn(&mut T, u64) ) {
         self.callback = Some(cb);
     }
 
