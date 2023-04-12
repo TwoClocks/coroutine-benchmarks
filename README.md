@@ -98,13 +98,37 @@ For the coroutine server code, this is the kotlin version which is probably the 
 All the coroutine version were written the same. The coroutine code suspends while the event loop spins on memory. When the coroutine code resumes w/ the new value, it writes it.
 
 
-### Suspend vs Resume
+## Suspend vs Resume
 
-The code flow for the coroutine code looks like this `SpinLoop->Resume->WriteValue->Suspend::Loop` Since the client is measuring the time it takes from `SpinLoop` to `WriteValue`, it most likely isn't measuring the time `Suspend` takes. There is no reason to think the time to `Resume` is the same as to `Suspend`.
+The code flow for the coroutine code looks like this :
+```mermaid
+stateDiagram
+    state "Client Measures This" as time
+    state  time {
+        SpinLoop --> Resume
+        Resume --> WriteValue
+    }
+    WriteValue --> Suspend
+    Suspend --> SpinLoop
+```
+
+Since the client is measuring the time it takes from `SpinLoop` to `WriteValue`, it most likely isn't measuring the time `Suspend` takes. There is no reason to think the time to `Resume` is the same as to `Suspend`.
 
 If the event loop is dispatching the same event to multiple listeners, or had multiple events to dispatch, you bear the cost of both the suspend and resume for each event.
 
-So I wrote two version of each coroutine. The version above is called the `Resume` version. The `Suspend` version code flow look like `SpinLoop->Suspend->WriteValue->Resume::Loop`. In the `Suspend` version the `SpinLoop` is in the coroutine code block, and the writing of the value is in the `eventLoop`.
+So I wrote two version of each coroutine. The version above is called the `Resume` version. The `Suspend` version code flow looks like :
+```mermaid
+stateDiagram
+    state "Client Measures This" as time
+    state  time {
+        SpinLoop --> Suspend
+        Suspend --> WriteValue
+    }
+    WriteValue --> Resume
+    Resume --> SpinLoop
+```
+
+ In the `Suspend` version the `SpinLoop` is in the coroutine code block, and the writing of the value is in the `eventLoop`.
 
 ### Callbacks
 The spin loop isn't a fair comparison to the coroutine code, so I added a callback version. I didn't write the reciprocal version of callback, like I did with the coroutine code. I'm just going to assume returning from a callback is cheap.

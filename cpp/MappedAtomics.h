@@ -1,6 +1,3 @@
-//
-// Created by jonross on 10/8/21.
-//
 
 #ifndef CPP_MAPPEDATOMICS_H
 #define CPP_MAPPEDATOMICS_H
@@ -13,6 +10,7 @@
 #include <cstring>
 #include <unistd.h>
 #include <atomic>
+#include <stdlib.h>
 
 struct MappedAtomics {
     std::atomic<long unsigned int> *clientPtr;
@@ -34,13 +32,13 @@ struct MappedAtomics {
                 S_IWUSR | S_IRGRP | S_IWGRP
         );
         if(shmFd <= 0 ) {
-            std::cout << "shm_open failed. exiting : " << std::strerror(errno) << std::endl;
-            throw std::system_error(errno, std::generic_category());
+            std::cout << "shm_open failed. Is the benchmark running? exiting. error : " << std::strerror(errno) << std::endl;
+            exit(-1);
         }
 //        std::cout << "shm fd = " << shmFd << std::endl;
         if( ftruncate( shmFd, getpagesize() ) != 0 )  {
-            std::cout << "ftruncate failed. exiting : " << std::strerror(errno) << std::endl;
-            throw std::system_error(errno, std::generic_category());
+            std::cout << "ftruncate failed. exiting. error : " << std::strerror(errno) << std::endl;
+            exit(-1);
         }
 
 

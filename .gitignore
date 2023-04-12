@@ -23,6 +23,9 @@ Cargo.lock
 .gradle
 build/
 
+# VsCode stuff
+.vscode
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
@@ -52,3 +55,4 @@ compile_commands.json
 CTestTestfile.cmake
 _depsv
 
+cpp/out

@@ -1,22 +1,22 @@
-use crate::{SAMPLE_SIZE, RUN_TIME, WARMUP_TIME};
+use crate::{SAMPLE_SIZE, SERVER_CPU};
 use criterion::{BatchSize, Criterion};
 use rand::RngCore;
 use crate::atomic_spin::MappedAtomics;
 use thread_priority::ThreadPriority;
 
 lazy_static! {
+    // Must have java 19
     pub static ref JAVA_OPTS: Vec<&'static str> = vec![
-        "--illegal-access=permit",
-        "--add-exports",
-        "java.base/jdk.internal.ref=ALL-UNNAMED",
         "-server",
-        "--illegal-access=permit",
+        "-Djava.library.path=zig/zig-out/lib",  // JVM used zig for shm_open call
+        "--enable-native-access=ALL-UNNAMED",
         // "-XX:+PrintCompilation", // un-comment to see when the JIT decides to compile.
 
     ];
 }
 pub fn launch_local(cmd: &str, params: &Vec<&str>) -> std::process::Child {
-    let mut process = std::process::Command::new(cmd);
+    let mut process = std::process::Command::new("nice");
+    process.arg("-n").arg("-20").arg("taskset").arg("-c").arg(SERVER_CPU).arg(cmd);
 
     for prm in params.iter() {
         process.arg(prm);
@@ -32,7 +32,8 @@ pub fn launch_local_java(
     java_opts: Option<&Vec<&str>>,
     program_args: &Vec<&str>,
 ) -> std::process::Child {
-    let mut process = std::process::Command::new("java");
+    let mut process = std::process::Command::new("nice");
+    process.arg("-n").arg("-20").arg("taskset").arg("-c").arg(SERVER_CPU).arg("java");
 
     if let Some(j_opts) = java_opts {
         for opt in j_opts.iter() {

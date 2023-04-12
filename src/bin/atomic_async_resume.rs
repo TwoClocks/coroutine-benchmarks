@@ -3,7 +3,6 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::atomic::Ordering;
 use std::io;
-use core_affinity::CoreId;
 use async_bench::atomic_spin::MappedAtomics;
 
 /// the main server loop. Async this time.
@@ -28,15 +27,6 @@ async fn async_loop_resume(state: Rc<RefCell<RuntimeState>>) {
 }
 
 fn main() -> io::Result<()> {
-
-
-    let cpu_num: usize = std::env::args()
-        .nth(1)
-        .expect("pass CPU # to ping to")
-        .parse()
-        .expect("Can't parse passed CPU # as a number");
-
-    core_affinity::set_for_current(CoreId { id: cpu_num });
 
     let state = Rc::new(
         RefCell::new(

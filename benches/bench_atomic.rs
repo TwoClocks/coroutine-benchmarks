@@ -80,7 +80,7 @@ fn cpp_bench(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child =
-        async_bench::bench_utils::launch_local("cpp/target/release/atomicSpin", vec![SERVER_CPU].as_ref());
+        async_bench::bench_utils::launch_local("cpp/out/atomicSpin", vec![SERVER_CPU].as_ref());
 
     async_bench::bench_utils::run_bench(c, "atomic_spin", "cpp_atomic", &client);
 
@@ -95,7 +95,7 @@ fn cpp_resume(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child =
-        async_bench::bench_utils::launch_local("cpp/target/release/asyncResume", vec![SERVER_CPU].as_ref());
+        async_bench::bench_utils::launch_local("cpp/out/asyncResume", vec![SERVER_CPU].as_ref());
 
     async_bench::bench_utils::run_bench(c, "atomic_spin", "cpp_resume", &client);
 
@@ -110,7 +110,7 @@ fn cpp_suspend(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child =
-        async_bench::bench_utils::launch_local("cpp/target/release/asyncSuspend", vec![SERVER_CPU].as_ref());
+        async_bench::bench_utils::launch_local("cpp/out/asyncSuspend", vec![SERVER_CPU].as_ref());
 
     async_bench::bench_utils::run_bench(c, "atomic_spin", "cpp_suspend", &client);
 
@@ -125,7 +125,7 @@ fn cpp_callback(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child =
-        async_bench::bench_utils::launch_local("cpp/target/release/atomicCallback", vec![SERVER_CPU].as_ref());
+        async_bench::bench_utils::launch_local("cpp/out/atomicCallback", vec![SERVER_CPU].as_ref());
 
     async_bench::bench_utils::run_bench(c, "atomic_spin", "cpp_callback", &client);
 
@@ -208,7 +208,7 @@ fn kotlin_bench(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local_java(
-        "kotlin/app/build/libs/app-all.jar",
+        "kotlin/servers.jar",
         "kotlin_servers.AtomicSpinKt",
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
@@ -226,7 +226,7 @@ fn kotlin_resume(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local_java(
-        "kotlin/app/build/libs/app-all.jar",
+        "kotlin/servers.jar",
         "kotlin_servers.AsyncResumeKt",
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
@@ -244,7 +244,7 @@ fn kotlin_suspend(c: &mut Criterion) {
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
 
     let mut child = async_bench::bench_utils::launch_local_java(
-        "kotlin/app/build/libs/app-all.jar",
+        "kotlin/servers.jar",
         "kotlin_servers.AsyncSuspendKt",
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
@@ -260,9 +260,9 @@ fn kotlin_callback(c: &mut Criterion) {
     let client = MappedAtomics::new(true);
 
     core_affinity::set_for_current(CoreId { id: CLIENT_CPU });
-
+    
     let mut child = async_bench::bench_utils::launch_local_java(
-        "kotlin/app/build/libs/app-all.jar",
+        "kotlin/servers.jar",
         "kotlin_servers.AtomicCallbackKt",
         Some(async_bench::bench_utils::JAVA_OPTS.as_ref()),
         vec![SERVER_CPU].as_ref(),
@@ -276,10 +276,6 @@ fn kotlin_callback(c: &mut Criterion) {
 
 criterion_group!(
     benches,
-    rust_callback,
-    rust_callback,
-    rust_callback,
-    rust_callback,
     cpp_bench,
     cpp_resume,
     cpp_suspend,

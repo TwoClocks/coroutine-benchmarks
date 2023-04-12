@@ -2,34 +2,29 @@
 const std = @import("std");
 const utils = @import("common.zig");
 
-// #
-// # libuv / Calloop / Stakker
-// #
+
 
 const EventLoop = struct {
-    const cbWrap = struct {
-        const callType = fn(*c_void, u64) void;
-        callback : *const c_void,
-        context : *c_void,
+    const callbackWrap = struct {
+        callback: fn(*anyopaque, u64) void,
+        context: *anyopaque,
 
-        fn doCall(self:*const cbWrap, value:u64) void {
-            const call_raw = @alignCast(@alignOf(callType), self.callback);
-            const call_ptr = @ptrCast(callType, call_raw);
-            @call(.{}, call_ptr, .{self.context, value});
-
+        fn doCall(self: callbackWrap, value: u64) void {
+            (self.callback)(self.context, value);
         }
     };
-    callback : ?cbWrap = null,
+
+    callback :?callbackWrap = null,
     clientPtr : *const u64,
 
     pub fn setCallback(
         self:*EventLoop,
-        C:anytype,
-        comptime F:fn(@TypeOf(C),u64)void
+        self_ptr:anytype,
+        comptime F:fn(@TypeOf(self_ptr),u64)void
     ) void {
-        self.callback = cbWrap {
-            .callback = @ptrCast(*const c_void, F),
-            .context = @ptrCast(*c_void, C),
+        self.callback = .{
+            .context = @ptrCast(*anyopaque, self_ptr),
+            .callback = @ptrCast(fn(*anyopaque, u64) void, F),
         };
     }
 
@@ -44,13 +39,12 @@ const EventLoop = struct {
     }
 };
 
-
 const SomeWorker = struct {
     someState : u64 = 0,
     serverPtr : *u64,
 
     pub fn doWork(self:*SomeWorker, value:u64) void {
-        @atomicStore(u64, self.serverPtr, value, std.builtin.AtomicOrder.Monotonic );
+        @atomicStore(u64, self.serverPtr, value, .Monotonic );
         self.someState = value;
     }
 };

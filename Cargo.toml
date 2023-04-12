@@ -1,19 +1,20 @@
 [package]
 name = "async_bench"
-version = "0.1.0"
-edition = "2018"
+version = "0.2.0"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-criterion = { version = "0.3", features = ["async_tokio"] }
+criterion = "0.4"
 rand = "0.8"
-core_affinity = "0.5"
+core_affinity = "0.8"
 byteorder = "1.4"
 libc = "0.2"
 lazy_static = "1.4"
-page_size = "0.4"
-thread-priority = "0.2"
+page_size = "0.5"
+thread-priority = "0.13"
+json = "0.12"
 
 [profile.release]
 lto = true

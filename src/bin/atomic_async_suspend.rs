@@ -2,7 +2,6 @@ use std::rc::Rc;
 use std::cell::RefCell;
 use std::sync::atomic::Ordering;
 use std::io;
-use core_affinity::CoreId;
 use async_bench::atomic_spin::MappedAtomics;
 use async_bench::async_impl::{RuntimeState, SpinFuture, Task};
 
@@ -25,15 +24,7 @@ async fn async_loop_suspend(state: Rc<RefCell<RuntimeState>>) {
 }
 
 fn main() -> io::Result<()> {
-
-    let cpu_num: usize = std::env::args()
-        .nth(1)
-        .expect("pass CPU # to ping to")
-        .parse()
-        .expect("Can't parse passed CPU # as a number");
-
-    core_affinity::set_for_current(CoreId { id: cpu_num });
-
+    
     let state = Rc::new(RefCell::new(
         RuntimeState::new(
             MappedAtomics::new( false )
